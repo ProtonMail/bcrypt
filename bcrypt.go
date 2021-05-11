@@ -132,7 +132,7 @@ func HashBytes(password []byte, salt ...[]byte) (hash []byte, err error) {
 
 	if !consume(sr, '$') {
 		minor, _ = sr.ReadByte()
-		if minor != 'a' || !consume(sr, '$') {
+		if (minor != 'a' && minor != 'y') || !consume(sr, '$') {
 			return nil, InvalidSalt
 		}
 	}
@@ -170,11 +170,11 @@ func HashBytes(password []byte, salt ...[]byte) (hash []byte, err error) {
 	}
 
 	// cipher expects null terminated input (go initializes everything with zero values so this works)
-	passwordTerm := make([]byte, len(password)+1)
-	copy(passwordTerm, password)
+	password_term := make([]byte, len(password)+1)
+	copy(password_term, password)
 
-	hashed := crypt_raw(passwordTerm, saltb[:SaltLen], rounds)
-	clear(passwordTerm)
+	hashed := crypt_raw(password_term, saltb[:SaltLen], rounds)
+	clear(password_term)
 	return build_bcrypt_str(minor, rounds, string(salt_bytes), hashed[:len(bf_crypt_ciphertext)*4-1]), nil
 }
 
